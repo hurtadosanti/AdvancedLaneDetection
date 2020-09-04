@@ -7,10 +7,10 @@ from utilities import image
 class CameraCalibrationTests(unittest.TestCase):
     def test_calibration(self):
         c = calibration.CameraCalibration()
-        op, ip = c.calibrate_camera('../camera_cal/calibration*.jpg')
+        c.calibrate_camera('../camera_cal/calibration*.jpg')
         original = cv2.imread('../camera_cal/test5.jpg')
         src = cv2.imread('../camera_cal/undistorted_test5.jpg')
-        dst = calibration.undistort_image('../camera_cal/test5.jpg', op, ip)
+        dst,mtx,dist = c.undistort_image(original)
 
         src_gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         dst_gray = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
