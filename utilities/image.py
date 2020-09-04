@@ -22,3 +22,18 @@ def draw_boundaries(img: np.ndarray, top=(400, 350), borders=(100, 100)) -> np.n
           (image_shape[1] - borders[1], image_shape[0])]],
         dtype=np.int32)
     return cv2.polylines(img, vertices, True, (255, 0, 0), 3)
+
+
+def warp_image(img, x=400, y=450, border=0):
+    src = np.float32([
+        [x, y],
+        [img.shape[1] - x, y],
+        [img.shape[1], img.shape[0]],
+        [0, img.shape[0]]])
+    dst = np.float32([
+        [0, 0],
+        [img.shape[1], 0],
+        [img.shape[1], img.shape[0] + border],
+        [border, img.shape[0] + border]])
+    m = cv2.getPerspectiveTransform(src, dst)
+    return cv2.warpPerspective(img, m, (img.shape[1], img.shape[0]), flags=cv2.INTER_LINEAR)
