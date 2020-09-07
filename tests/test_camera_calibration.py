@@ -1,7 +1,7 @@
 import unittest
 import cv2
 from utilities import calibration
-from utilities import image
+from utilities import image_utility
 
 
 class CameraCalibrationTests(unittest.TestCase):
@@ -14,8 +14,8 @@ class CameraCalibrationTests(unittest.TestCase):
 
         src_gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         dst_gray = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
-        mse = image.mse(src_gray, dst_gray)
-        mse_original = image.mse(cv2.cvtColor(original, cv2.COLOR_BGR2GRAY), dst_gray)
+        mse = image_utility.mse(src_gray, dst_gray)
+        mse_original = image_utility.mse(cv2.cvtColor(original, cv2.COLOR_BGR2GRAY), dst_gray)
         self.assertGreater(mse_original, 1000)
         self.assertLess(mse, 1)
 
