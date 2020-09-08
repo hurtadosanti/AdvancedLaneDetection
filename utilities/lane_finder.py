@@ -131,10 +131,8 @@ class Lanes:
 
         # Fit new polynomials
         left_fitx, right_fitx, ploty = self.fit_poly(leftx, lefty, rightx, righty)
-        print(self.image.shape, image.shape)
         out_img = np.dstack((self.image, self.image, self.image)) * 255
         window_img = np.zeros_like(out_img)
-        print(out_img.shape, non_zero_y.shape, left_lane_inds.shape)
         out_img[non_zero_y[left_lane_inds], non_zero_x[left_lane_inds]] = [255, 0, 0]
         out_img[non_zero_y[right_lane_inds], non_zero_x[right_lane_inds]] = [0, 0, 255]
 

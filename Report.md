@@ -1,42 +1,85 @@
 # Advanced Lane Finding Project Report
 
 ## Camera Calibration
-The purpose of the camera calibration is to reduce the distortion of the images created by the cameras. For this we have created a class:
+The purpose of the camera calibration is to reduce the distortion of the images created by the cameras. For this we have
+ created a class:
 
     utilities.calibration.CameraCalibration
 
 The purpose of the class is to:
 
-- Obtain the 3D points called *object points* and 2D points called *image points* using the method calibrate_camera(), the method recives a path parameter that contains the images 
+- Obtain the 3D points called *object points* and 2D points called *image points* using the method calibrate_camera(),
+ the method receive a path parameter that contains the images 
 necessary for the calibration
 
-- It is also possible to serialize object and image points into a file, so this steps does not have to be executed every time.
+- It is also possible to serialize object and image points into a file,
+ so this steps does not have to be executed every time.
 
-- The camera calibration class also provides a method that allows to undistort an image and return the camera matrix and distortion coefficients, required for further calls to the undistort method of opencv
+- The camera calibration class also provides a method that allows to undistort an image and return the camera matrix,
+ and distortion coefficients, required for further calls to the undistort method of opencv
 
-The calibrate_camera calculates the object and image points on the chessboards, finds the corners and draw them on the images. These points are calculated for each image and stored. The ouput can be seend by passing True to the second parameter, an output folder prepend by 'output_' must exist. 
+The calibrate_camera calculates the object and image points on the chessboards,
+ finds the corners and draw them on the images. These points are calculated for each image and stored.
+  The output can be seen by passing True to the second parameter, an output folder prepend by 'output_' must exist. 
+
+### Original image
+
+![original](results/original.jpg)
+
+### Undistort image
+
+![undistort](results/undistort.jpg)
+
+## Pipeline (single images)
+
+### Distortion-corrected image.
+
+For this step the camera correction points calculated and persisted before are used.
+ After loading the points the image is undistorted by using the *undistort_image* method
+  from *utilities.calibration.CameraCalibration* class is used.
+
+![undistorted_lane](results/undistorted_line.png)
+
+### Thresholded binary image
+
+A combination of color and gradient thresholds to generate a binary image
+ (thresholding steps at lines 39 through 58 in `utilities.thresholds.py`), was used to  find the lanes.
+ 
+- First the image is converted to the hls color space, and the s_channel is selected. 
+- The threshold on the x axis, the magnitude and directions are calculated to be combined,
+ and highlight the lanes on the road.  
+
+The result can be seen here:
+
+![thresholds](results/thresholds.png)
+
+On the [jupyter notebook](tests/test_threshold.ipynb) can seen the different results for the test images.
 
 
+### Perspective transform
+The code to warp the image can be found on the `utilities.image_utility.py` file, line 27. The hardcode points divide 
+the x axis in two, and provide a threshold where the lanes can be found. For the y axis a fix number is used,
+ and a margin is selected to remove the hood of the car. 
+ 
+![warp_image](results/warped_image.png)
 
-![alt text][image1]
 
-### Pipeline (single images)
+I chose the hardcode the source and destination points in the following manner:
 
-#### 1. Provide an example of a distortion-corrected image.
-
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
-![alt text][image2]
-
-#### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
-
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
-
-![alt text][image3]
-
-#### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
-
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
-
+```python
+half = image.shape[1] // 2
+    src = np.float32([
+    [half - width, y],
+    [half + width, y],
+    [image.shape[1] - border, image.shape[0] - border],
+    [border, image.shape[0] - border]])
+dst = np.float32([
+    [0, 0],
+    [image.shape[1], 0],
+    [image.shape[1], image.shape[0]],
+    [0, image.shape[0]]])
+```
+However using the recommended values also provide a good result:
 ```python
 src = np.float32(
     [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
@@ -49,29 +92,32 @@ dst = np.float32(
     [(img_size[0] * 3 / 4), img_size[1]],
     [(img_size[0] * 3 / 4), 0]])
 ```
+The [jupyter notebook](tests/test_warp_image.ipynb) shows the results for all the test images.
 
-This resulted in the following source and destination points:
+### Lane identification
+The code for the lane identification can be found in the [utilities.lane_finder.Lanes](utilities/lane_finder.py) class.
 
-| Source        | Destination   | 
-|:-------------:|:-------------:| 
-| 585, 460      | 320, 0        | 
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+To identify the lanes, first the histogram is calculated.
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+![histogram](results/histogram.png)
+ 
+Then calling the fit_polynomial, the sliding windows algorithm will be used to identify the complete line.
 
-![alt text][image4]
+![sliding windows](results/sliding_window.png)
 
-#### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
+To make it faster it is also possible to search where the line was found before using the `search_around_poly()` method.
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+![search](results/search_around.png)
+ 
+### Lane-line pixels
+The lane vectors can be found using the `generate_plotting_values()` method.
 
-![alt text][image5]
+![vectors](results/lane_vectors.png).
 
-#### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
-
-I did this in lines # through # in my code in `my_other_file.py`
+### Curvature calculation  
+On the [image utility](utilities/image_utility.py) there are two methods, one to find the curvature in pixels,
+ and another in meters. `image_utility.measure_curvature_pixels`, `image_utility.measure_curvature_real`. 
+ The methods calculate the curvature using the polynomial functions
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 

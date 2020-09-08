@@ -25,17 +25,28 @@ def draw_boundaries(image: np.ndarray, top=(400, 350), borders=(100, 100)) -> np
 
 
 def warp_image(image, width=130, y=500, border=10):
-    half = image.shape[1] // 2
-    src = np.float32([
-        [half - width, y],
-        [half + width, y],
-        [image.shape[1] - border, image.shape[0] - border],
-        [border, image.shape[0] - border]])
-    dst = np.float32([
-        [0, 0],
-        [image.shape[1], 0],
-        [image.shape[1], image.shape[0]],
-        [0, image.shape[0]]])
+    # half = image.shape[1] // 2
+    # src = np.float32([
+    #     [half - width, y],
+    #     [half + width, y],
+    #     [image.shape[1] - border, image.shape[0] - border],
+    #     [border, image.shape[0] - border]])
+    # dst = np.float32([
+    #     [0, 0],
+    #     [image.shape[1], 0],
+    #     [image.shape[1], image.shape[0]],
+    #     [0, image.shape[0]]])
+    img_size = (image.shape[1], image.shape[0])
+    src = np.float32(
+        [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
+         [((img_size[0] / 6) - 10), img_size[1]],
+         [(img_size[0] * 5 / 6) + 60, img_size[1]],
+         [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
+    dst = np.float32(
+        [[(img_size[0] / 4), 0],
+         [(img_size[0] / 4), img_size[1]],
+         [(img_size[0] * 3 / 4), img_size[1]],
+         [(img_size[0] * 3 / 4), 0]])
     m = cv2.getPerspectiveTransform(src, dst)
     return cv2.warpPerspective(image, m, (image.shape[1], image.shape[0]), flags=cv2.INTER_LINEAR)
 

@@ -10,7 +10,7 @@ class CameraCalibrationTests(unittest.TestCase):
         c.calibrate_camera('../camera_cal/calibration*.jpg')
         original = cv2.imread('../camera_cal/test5.jpg')
         src = cv2.imread('../camera_cal/undistorted_test5.jpg')
-        dst,mtx,dist = c.undistort_image(original)
+        dst, mtx, dist = c.undistort_image(original)
 
         src_gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         dst_gray = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
