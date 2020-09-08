@@ -1,26 +1,19 @@
 # Advanced Lane Finding Project Report
 
+This report is divided in four(4) sections, 1) Camera Calibration, 2) Pipeline for a single image,
+ 3) How the pipeline works on a video and 4) Conclusions and future work.
+
 ## Camera Calibration
-The purpose of the camera calibration is to reduce the distortion of the images created by the cameras. For this we have
- created a class:
+The purpose of the camera calibration is to reduce the distortion of the images created by the cameras. 
 
-    utilities.calibration.CameraCalibration
+The class [utilities.calibration.CameraCalibration](utilities/calibration.py) allows the calibration, serialization, deserialization, and to undistort images. The calibration method receives a path parameter that contains the images, and a boolean parameter to write the image results for visual inspection.
 
-The purpose of the class is to:
+The calibration calculates the 3D object and 2D image points on the chessboard images. For each image finds the corners of each square, if found it stores and draw them on the images for visual inspection. 
 
-- Obtain the 3D points called *object points* and 2D points called *image points* using the method calibrate_camera(),
- the method receive a path parameter that contains the images 
-necessary for the calibration
+It is also possible to serialize object and image points into a file, so this calibration step does not have to be executed every time.
+The undistort method allows to distort an image and return the camera matrix, and distortion coefficients, required for further calls to the undistort method of OpenCV.
 
-- It is also possible to serialize object and image points into a file,
- so this steps does not have to be executed every time.
-
-- The camera calibration class also provides a method that allows to undistort an image and return the camera matrix,
- and distortion coefficients, required for further calls to the undistort method of opencv
-
-The calibrate_camera calculates the object and image points on the chessboards,
- finds the corners and draw them on the images. These points are calculated for each image and stored.
-  The output can be seen by passing True to the second parameter, an output folder prepend by 'output_' must exist. 
+The result can be seen on the following two images:
 
 ### Original image
 
@@ -31,23 +24,22 @@ The calibrate_camera calculates the object and image points on the chessboards,
 ![undistort](results/undistort.jpg)
 
 ## Pipeline (single images)
+The single image pipeline can be found as a [Jupyter notebook Pipeline](Pipeline.ipynb). The purpose is to describe the steps done to find and draw the lanes.
 
 ### Distortion-corrected image.
-
-For this step the camera correction points calculated and persisted before are used.
+The first step is to have the camera correction points calculated and persisted before needed.
  After loading the points the image is undistorted by using the *undistort_image* method
-  from *utilities.calibration.CameraCalibration* class is used.
+  from *utilities.calibration.CameraCalibration* class.
 
 ![undistorted_lane](results/undistorted_line.png)
 
 ### Thresholded binary image
 
-A combination of color and gradient thresholds to generate a binary image
- (thresholding steps at lines 39 through 58 in `utilities.thresholds.py`), was used to  find the lanes.
+A combination of color and gradient thresholds are used to generate a binary image. On the line 39 of the [utilities.thresholds.py](utilities/thresholds.py), the `highlight_features` method was used to  find the lanes.
  
 - First the image is converted to the hls color space, and the s_channel is selected. 
-- The threshold on the x axis, the magnitude and directions are calculated to be combined,
- and highlight the lanes on the road.  
+- The Sobel threshold is calculated on the x axis, as well as the magnitude and directions.
+- Finally the are combined to highlight the lanes on the road.  
 
 The result can be seen here:
 
@@ -55,18 +47,13 @@ The result can be seen here:
 
 On the [jupyter notebook](tests/test_threshold.ipynb) can seen the different results for the test images.
 
-
 ### Perspective transform
-The code to warp the image can be found on the `utilities.image_utility.py` file, line 27. The hardcode points divide 
-the x axis in two, and provide a threshold where the lanes can be found. For the y axis a fix number is used,
- and a margin is selected to remove the hood of the car. 
+The code to warp the image can be found on the [utilities.image_utility.py](utilities/image_utility.py) using the `warp_image` method. 
+
+Two methods where used 
+1. The hardcode points divide the x axis in two, and provide a threshold where the lanes can be found. For the y axis a fix number is used, and a margin is selected to remove the hood of the car. 
  
-![warp_image](results/warped_image.png)
-
-
-I chose the hardcode the source and destination points in the following manner:
-
-```python
+ ```python
 half = image.shape[1] // 2
     src = np.float32([
     [half - width, y],
@@ -79,7 +66,10 @@ dst = np.float32([
     [image.shape[1], image.shape[0]],
     [0, image.shape[0]]])
 ```
-However using the recommended values also provide a good result:
+
+![warp_image](results/warped_image.png)
+2. However using the recommended values also provide a good result, which is the one used for the rest of the images
+
 ```python
 src = np.float32(
     [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
@@ -97,7 +87,7 @@ The [jupyter notebook](tests/test_warp_image.ipynb) shows the results for all th
 ### Lane identification
 The code for the lane identification can be found in the [utilities.lane_finder.Lanes](utilities/lane_finder.py) class.
 
-To identify the lanes, first the histogram is calculated.
+To identify where the lanes start, first the histogram is calculated.
 
 ![histogram](results/histogram.png)
  
@@ -115,27 +105,22 @@ The lane vectors can be found using the `generate_plotting_values()` method.
 ![vectors](results/lane_vectors.png).
 
 ### Curvature calculation  
-On the [image utility](utilities/image_utility.py) there are two methods, one to find the curvature in pixels,
- and another in meters. `image_utility.measure_curvature_pixels`, `image_utility.measure_curvature_real`. 
- The methods calculate the curvature using the polynomial functions
+On the [image utility](utilities/image_utility.py) there are two methods, one to find the curvature in pixels, and another in meters. `image_utility.measure_curvature_pixels`, `image_utility.measure_curvature_real`. The methods calculate the curvature using the polynomial functions
 
-#### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
+### Resultant lane 
+Finally the lane is detected filled with the cv2.fillPoly from the [utilities.lane_finder.py](utilities.lane_finder.py) as presented on the line 152. 
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
-
-![alt text][image6]
+The lane detected is warped back using the first parameter `reverse` of the original warp method on the `utilities.image_utility.py` file, on line 27, and the method `utilities.image_utility.reverse_warp()`.  
 
 ---
 
-### Pipeline (video)
-
-#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
-
-Here's a [link to my video result](./project_video.mp4)
-
+### Pipeline ([Video](https://youtu.be/1fVVo3qW_Hk))
+The [video_pipeline.py](video_pipeline.py) contains the code to execute the pipeline on a video. The first frame uses the sliding window method, and the following steps use the search_around_poly method so uses the original lane polygon.
 ---
 
-### Discussion
+### Conclusions
+
+
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 

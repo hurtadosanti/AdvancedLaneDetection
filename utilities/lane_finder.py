@@ -143,7 +143,7 @@ class Lanes:
         left_line_pts = np.hstack((left_line_window1, left_line_window2))
         right_line_window1 = np.array([np.transpose(np.vstack([right_fitx - margin, self.plot_y]))])
         right_line_window2 = np.array([np.flipud(np.transpose(np.vstack([right_fitx + margin, self.plot_y])))])
-        # Stack and add to the original image
+        # Add to the original image
         right_line_pts = np.hstack((right_line_window1, right_line_window2))
         cv2.fillPoly(window_img, np.int_([left_line_pts]), (0, 255, 0))
         cv2.fillPoly(window_img, np.int_([right_line_pts]), (0, 255, 0))

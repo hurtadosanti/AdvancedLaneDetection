@@ -2,6 +2,7 @@
 import numpy as np
 import cv2
 import glob
+import os
 import logging
 import pickle
 
@@ -30,11 +31,10 @@ class CameraCalibration:
         self.image_points_found = []  # 2d points in image plane.
         self.image_points_found.clear()
         # Path of the images to calibrate the camera
-        images = glob.glob(path)
-
         # Read
-        for image_name in images:
-            img = cv2.imread(image_name)
+        for image_name in [i for i in os.listdir(path) if i.endswith('.jpg')]:
+            img = cv2.imread(path+image_name)
+            logging.info(path+image_name)
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             ret, corners = cv2.findChessboardCorners(gray, (nx, ny), None)
             if ret:
