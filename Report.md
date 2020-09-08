@@ -1,30 +1,4 @@
-# Advanced Lane Finding Project
-
-## Introduction
-The goals of this project are the following:
-
-* Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
-* Apply a distortion correction to raw images.
-* Use color transforms, gradients, etc., to create a thresholded binary image.
-* Apply a perspective transform to rectify binary image ("birds-eye view").
-* Detect lane pixels and fit to find the lane boundary.
-* Determine the curvature of the lane and vehicle position with respect to center.
-* Warp the detected lane boundaries back onto the original image.
-* Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
-
-[//]: # (Image References)
-
-[image1]: ./examples/undistort_output.png "Undistorted"
-[image2]: ./test_images/test1.jpg "Road Transformed"
-[image3]: ./examples/binary_combo_example.jpg "Binary Example"
-[image4]: ./examples/warped_straight_lines.jpg "Warp Example"
-[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
-[video1]: ./project_video.mp4 "Video"
-
-## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
-
----
+# Advanced Lane Finding Project Report
 
 ## Camera Calibration
 The purpose of the camera calibration is to reduce the distortion of the images created by the cameras. For this we have created a class:
@@ -34,7 +8,7 @@ The purpose of the camera calibration is to reduce the distortion of the images 
 The purpose of the class is to:
 
 - Obtain the 3D points called *object points* and 2D points called *image points* using the method calibrate_camera(), the method recives a path parameter that contains the images 
-necesary for the calibration
+necessary for the calibration
 
 - It is also possible to serialize object and image points into a file, so this steps does not have to be executed every time.
 
