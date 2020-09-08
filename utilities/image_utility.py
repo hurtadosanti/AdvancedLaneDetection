@@ -46,6 +46,32 @@ def calculate_histogram(image: np.ndarray) -> np.ndarray:
     return np.sum(bottom_half, axis=0)
 
 
+def measure_curvature_pixels(plot_y, left_fit, right_fit):
+    """
+    Calculates the curvature of polynomial functions in pixels.
+    """
+    y_eval = np.max(plot_y)
+    left_curve = ((1 + (2 * left_fit[0] * y_eval + left_fit[1]) ** 2) ** 1.5) / np.absolute(2 * left_fit[0])
+    right_curve = ((1 + (2 * right_fit[0] * y_eval + right_fit[1]) ** 2) ** 1.5) / np.absolute(2 * right_fit[0])
+
+    return left_curve, right_curve
+
+
+def measure_curvature_real(plot_y, left_fit, right_fit):
+    """
+    Calculates the curvature of polynomial functions in meters.
+    """
+    # Define conversions in x and y from pixels space to meters
+    ym_per_pix = 30 / 720  # meters per pixel in y dimension
+    y_eval = np.max(plot_y)
+    left_curve = ((1 + (2 * left_fit[0] * y_eval * ym_per_pix + left_fit[1]) ** 2) ** 1.5) / np.absolute(
+        2 * left_fit[0])
+    right_curve = ((1 + (2 * right_fit[0] * y_eval * ym_per_pix + right_fit[1]) ** 2) ** 1.5) / np.absolute(
+        2 * right_fit[0])
+
+    return left_curve, right_curve
+
+
 if __name__ == '__main__':
     img = cv2.imread('../test_images/test1.jpg')
     cv2.imshow('test1', img)

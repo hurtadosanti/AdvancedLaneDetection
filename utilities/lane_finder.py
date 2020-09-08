@@ -13,6 +13,7 @@ class Lanes:
         self.right_lane_idx = []
         self.left_fit = None
         self.right_fit = None
+        self.plot_y = None
 
     def _find_lanes(self, number_windows: int = 9, margin: int = 100, min_pixels: int = 50):
         """Return left_x,left_y,right_x,right_y"""
@@ -75,31 +76,32 @@ class Lanes:
         left_x, left_y, right_x, right_y = self._find_lanes()
         self.left_fit = np.polyfit(left_y, left_x, 2)
         self.right_fit = np.polyfit(right_y, right_x, 2)
+        self.plot_y = np.linspace(0, self.image.shape[0] - 1, self.image.shape[0])
         self.out_image[left_y, left_x] = [255, 0, 0]
         self.out_image[right_y, right_x] = [0, 0, 255]
+        return self.plot_y, self.left_fit, self.right_fit
 
     def generate_plotting_values(self):
         # Generate x and y values for plotting
-        plot_y = np.linspace(0, self.image.shape[0] - 1, self.image.shape[0])
+        self.plot_y = np.linspace(0, self.image.shape[0] - 1, self.image.shape[0])
         try:
-            left_fit_x = self.left_fit[0] * plot_y ** 2 + self.left_fit[1] * plot_y + self.left_fit[2]
-            right_fit_x = self.right_fit[0] * plot_y ** 2 + self.right_fit[1] * plot_y + self.right_fit[2]
+            left_fit_x = self.left_fit[0] * self.plot_y ** 2 + self.left_fit[1] * self.plot_y + self.left_fit[2]
+            right_fit_x = self.right_fit[0] * self.plot_y ** 2 + self.right_fit[1] * self.plot_y + self.right_fit[2]
         except TypeError as t:
             # Avoids an error if `left` and `right_fit` are still none or incorrect
             logging.error('The function failed to fit a line!', str(t))
-            left_fit_x = 1 * plot_y ** 2 + 1 * plot_y
-            right_fit_x = 1 * plot_y ** 2 + 1 * plot_y
-        return plot_y, left_fit_x, right_fit_x
+            left_fit_x = 1 * self.plot_y ** 2 + 1 * self.plot_y
+            right_fit_x = 1 * self.plot_y ** 2 + 1 * self.plot_y
+        return self.plot_y, left_fit_x, right_fit_x
 
     def fit_poly(self,leftx, lefty, rightx, righty):
         self.left_fit = np.polyfit(lefty, leftx, 2)
         self.right_fit = np.polyfit(righty, rightx, 2)
         # Generate x and y values for plotting
-        ploty = np.linspace(0, self.image.shape[0] - 1, self.image.shape[0])
-        print(ploty.shape)
-        left_fitx = self.left_fit[0] * ploty ** 2 + self.left_fit[1] * ploty + self.left_fit[2]
-        right_fitx = self.right_fit[0] * ploty ** 2 + self.right_fit[1] * ploty + self.right_fit[2]
-        return left_fitx, right_fitx, ploty
+        self.plot_y = np.linspace(0, self.image.shape[0] - 1, self.image.shape[0])
+        left_fit_x = self.left_fit[0] * self.plot_y ** 2 + self.left_fit[1] * self.plot_y + self.left_fit[2]
+        right_fit_x = self.right_fit[0] * self.plot_y ** 2 + self.right_fit[1] * self.plot_y + self.right_fit[2]
+        return left_fit_x, right_fit_x, self.plot_y
 
     def search_around_poly(self, image):
         margin = 100
@@ -146,5 +148,4 @@ class Lanes:
         right_line_pts = np.hstack((right_line_window1, right_line_window2))
         cv2.fillPoly(window_img, np.int_([left_line_pts]), (0, 255, 0))
         cv2.fillPoly(window_img, np.int_([right_line_pts]), (0, 255, 0))
-        result = cv2.addWeighted(out_img, 1, window_img, 0.3, 0)
-        return result
+        return cv2.addWeighted(out_img, 1, window_img, 0.3, 0)
