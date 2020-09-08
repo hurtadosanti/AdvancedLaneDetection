@@ -48,7 +48,15 @@ def warp_image(image, width=130, y=500, border=10):
          [(img_size[0] * 3 / 4), img_size[1]],
          [(img_size[0] * 3 / 4), 0]])
     m = cv2.getPerspectiveTransform(src, dst)
-    return cv2.warpPerspective(image, m, (image.shape[1], image.shape[0]), flags=cv2.INTER_LINEAR)
+    # Get the M to be able to return from the bird view back to the original image
+    reverse = cv2.getPerspectiveTransform(dst, src)
+    return cv2.warpPerspective(image, m, (image.shape[1], image.shape[0]), flags=cv2.INTER_AREA), reverse
+
+
+def reverse_warp(image, result_img, reverse, shape, beta):
+    inv = cv2.warpPerspective(result_img, reverse, shape, flags=cv2.INTER_LINEAR)
+    # for alpha we use 1 so the original image is not degraded
+    return cv2.addWeighted(image, 1, inv, beta, 0)
 
 
 def calculate_histogram(image: np.ndarray) -> np.ndarray:

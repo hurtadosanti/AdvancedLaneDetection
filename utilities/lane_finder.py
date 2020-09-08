@@ -94,7 +94,7 @@ class Lanes:
             right_fit_x = 1 * self.plot_y ** 2 + 1 * self.plot_y
         return self.plot_y, left_fit_x, right_fit_x
 
-    def fit_poly(self,leftx, lefty, rightx, righty):
+    def fit_poly(self, leftx, lefty, rightx, righty):
         self.left_fit = np.polyfit(lefty, leftx, 2)
         self.right_fit = np.polyfit(righty, rightx, 2)
         # Generate x and y values for plotting
@@ -113,37 +113,45 @@ class Lanes:
         non_zero_x = np.array(non_zero[1])
 
         left_lane_inds = ((non_zero_x > (self.left_fit[0] * (non_zero_y ** 2) + self.left_fit[1] * non_zero_y +
-                                       self.left_fit[2] - margin)) & (non_zero_x < (self.left_fit[0] * (non_zero_y ** 2) +
-                                                                                  self.left_fit[1] * non_zero_y +
-                                                                                  self.left_fit[
-                                                                                      2] + margin)))
+                                         self.left_fit[2] - margin)) & (
+                                  non_zero_x < (self.left_fit[0] * (non_zero_y ** 2) +
+                                                self.left_fit[1] * non_zero_y +
+                                                self.left_fit[
+                                                    2] + margin)))
         right_lane_inds = ((non_zero_x > (self.right_fit[0] * (non_zero_y ** 2) + self.right_fit[1] * non_zero_y +
-                                        self.right_fit[2] - margin)) & (
-                                       non_zero_x < (self.right_fit[0] * (non_zero_y ** 2) +
-                                                   self.right_fit[1] * non_zero_y + self.right_fit[
-                                                       2] + margin)))
-
+                                          self.right_fit[2] - margin)) & (
+                                   non_zero_x < (self.right_fit[0] * (non_zero_y ** 2) +
+                                                 self.right_fit[1] * non_zero_y + self.right_fit[
+                                                     2] + margin)))
         # Again, extract left and right line pixel positions
-        leftx = non_zero_x[left_lane_inds]
-        lefty = non_zero_y[left_lane_inds]
-        rightx = non_zero_x[right_lane_inds]
-        righty = non_zero_y[right_lane_inds]
 
         # Fit new polynomials
-        left_fitx, right_fitx, ploty = self.fit_poly(leftx, lefty, rightx, righty)
-        out_img = np.dstack((self.image, self.image, self.image)) * 255
-        window_img = np.zeros_like(out_img)
-        out_img[non_zero_y[left_lane_inds], non_zero_x[left_lane_inds]] = [255, 0, 0]
-        out_img[non_zero_y[right_lane_inds], non_zero_x[right_lane_inds]] = [0, 0, 255]
+        left_fitx, right_fitx, self.plot_y = self.fit_poly(
+            non_zero_x[left_lane_inds], non_zero_y[left_lane_inds],
+            non_zero_x[right_lane_inds], non_zero_y[right_lane_inds]
+        )
 
-        left_line_window1 = np.array([np.transpose(np.vstack([left_fitx - margin, ploty]))])
-        left_line_window2 = np.array([np.flipud(np.transpose(np.vstack([left_fitx + margin,
-                                                                        ploty])))])
+        # Image of the resultant lane
+        result_img = np.dstack((self.image, self.image, self.image)) * 255
+        window_img = np.zeros_like(result_img)
+        result_img[non_zero_y[left_lane_inds], non_zero_x[left_lane_inds]] = [255, 0, 0]
+        result_img[non_zero_y[right_lane_inds], non_zero_x[right_lane_inds]] = [0, 0, 255]
+
+        # Calculate the windows to search the points
+        left_line_window1 = np.array([np.transpose(np.vstack([left_fitx - margin, self.plot_y]))])
+        left_line_window2 = np.array([np.flipud(np.transpose(np.vstack([left_fitx + margin, self.plot_y])))])
         left_line_pts = np.hstack((left_line_window1, left_line_window2))
-        right_line_window1 = np.array([np.transpose(np.vstack([right_fitx - margin, ploty]))])
-        right_line_window2 = np.array([np.flipud(np.transpose(np.vstack([right_fitx + margin,
-                                                                         ploty])))])
+        right_line_window1 = np.array([np.transpose(np.vstack([right_fitx - margin, self.plot_y]))])
+        right_line_window2 = np.array([np.flipud(np.transpose(np.vstack([right_fitx + margin, self.plot_y])))])
+        # Stack and add to the original image
         right_line_pts = np.hstack((right_line_window1, right_line_window2))
         cv2.fillPoly(window_img, np.int_([left_line_pts]), (0, 255, 0))
         cv2.fillPoly(window_img, np.int_([right_line_pts]), (0, 255, 0))
-        return cv2.addWeighted(out_img, 1, window_img, 0.3, 0)
+        window_lanes = cv2.addWeighted(result_img, 1, window_img, 0.3, 0)
+
+        # Draw the lane section
+        pts_left = np.array([np.transpose(np.vstack([left_fitx, self.plot_y]))])
+        pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, self.plot_y])))])
+        pts = np.hstack((pts_left, pts_right))
+        cv2.fillPoly(result_img, np.int_([pts]), (0, 255, 0))
+        return window_lanes, result_img, left_line_pts, right_line_pts
