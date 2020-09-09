@@ -1,6 +1,10 @@
 import numpy as np
 import cv2
 
+# Define conversions in x and y from pixels space to meters
+xm_per_pix = 3.7 / 700
+ym_per_pix = 30 / 720
+
 
 def mse(a, b):
     """https://www.pyimagesearch.com/2014/09/15/python-compare-two-images/"""
@@ -80,15 +84,27 @@ def measure_curvature_real(plot_y, left_fit, right_fit):
     """
     Calculates the curvature of polynomial functions in meters.
     """
-    # Define conversions in x and y from pixels space to meters
-    ym_per_pix = 30 / 720  # meters per pixel in y dimension
     y_eval = np.max(plot_y)
     left_curve = ((1 + (2 * left_fit[0] * y_eval * ym_per_pix + left_fit[1]) ** 2) ** 1.5) / np.absolute(
         2 * left_fit[0])
     right_curve = ((1 + (2 * right_fit[0] * y_eval * ym_per_pix + right_fit[1]) ** 2) ** 1.5) / np.absolute(
         2 * right_fit[0])
-
     return left_curve, right_curve
+
+
+def measure_vehicle_distance(point_y, point_x, left_fit, right_fit):
+    """
+    Calculate the distance at point y
+    """
+    # Calculate the x points at the y axis defined
+    left_x = left_fit[0]*point_y**2 + left_fit[1]*point_y + left_fit[2]
+    right_x = right_fit[0]*point_y**2 + right_fit[1]*point_y + right_fit[2]
+    # Calculate the center of the two points
+    center = (left_x+right_x)//2
+    # Calculate the difference to the actual center of the image
+    position = (point_x//2)-center
+    # convert to meters
+    return position*xm_per_pix
 
 
 if __name__ == '__main__':

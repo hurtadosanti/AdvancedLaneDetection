@@ -130,7 +130,6 @@ class Lanes:
             non_zero_x[left_lane_inds], non_zero_y[left_lane_inds],
             non_zero_x[right_lane_inds], non_zero_y[right_lane_inds]
         )
-
         # Image of the resultant lane
         result_img = np.dstack((self.image, self.image, self.image)) * 255
         window_img = np.zeros_like(result_img)
