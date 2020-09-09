@@ -1,4 +1,6 @@
 # Advanced Lane Detection
+![result](results/result.png)
+
 The goals of this project are the following:
 
 * Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
@@ -17,6 +19,8 @@ The goals of this project are the following:
 - A [Detailed Report](Report.md) presents what was done 
 
 - The [Pipeline description](Pipeline.ipynb) shows how the pipeline is used
+
+- The [video pipeline](video_pipeline.py) runs the pipeline for a [video](https://youtu.be/yAzrk6jL2NY)  
 
 - On the [utilities folder](./utilities) can be found the complete implementation of the algorithms
 
