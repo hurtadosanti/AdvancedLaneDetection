@@ -37,7 +37,7 @@ def _get_dir_threshold(image: np.ndarray, sobel_kernel: int = 3, thresh=(0, np.p
 
 
 def highlight_features(image: np.ndarray, kernel_size=3, x_threshold=(0, 255), mag_threshold=(0, 255),
-                       dir_threshold=(0.5, np.pi / 2), s_threshold=(0, 255)) -> (np.ndarray, np.ndarray):
+                       dir_threshold=(0.5, np.pi / 2), s_threshold=(0, 255)) -> np.ndarray:
     """Highlight features for line finding independent of color or shadows"""
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     hls = cv2.cvtColor(image, cv2.COLOR_BGR2HLS)
@@ -55,4 +55,4 @@ def highlight_features(image: np.ndarray, kernel_size=3, x_threshold=(0, 255), m
     _combined_binary = np.zeros_like(sx_binary)
     _combined_binary[(_s_binary == 1) | (sx_binary == 1) | ((mag_binary == 1) & (dir_binary == 1))] = 1
 
-    return _combined_binary, _s_binary
+    return _combined_binary
