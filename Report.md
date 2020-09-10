@@ -85,7 +85,7 @@ dst = np.float32(
 The [jupyter notebook](tests/test_warp_image.ipynb) shows the results for all the test images.
 
 ### Lane identification
-The code for the lane identification can be found in the [utilities.lane_finder.Lanes](utilities/lane_finder.py) class.
+The code for the lane identification can be found in the [utilities.lane_finder.Lanes](utilities/finder.py) class.
 
 To identify where the lanes start, first the histogram is calculated.
 

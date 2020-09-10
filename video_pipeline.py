@@ -3,7 +3,7 @@ import numpy as np
 
 from utilities import calibration
 from utilities import image_utility
-from utilities import lane_finder
+from utilities import finder
 from utilities import thresholds
 
 
@@ -34,7 +34,7 @@ class VideoLaneLineDetection:
             warped, reverse = image_utility.warp_image(undistorted, 140, 470, 100)
             combined_binary = thresholds.highlight_features(warped, 7, (50, 150), (50, 200), (0.5, np.pi / 2),
                                                             (80, 200))
-            lanes = lane_finder.Lanes(combined_binary)
+            lanes = finder.LaneFinder(combined_binary)
             plot_y, left_fit, right_fit = lanes.fit_polynomial()
 
             left, right = image_utility.measure_curvature_real(plot_y, left_fit, right_fit)
