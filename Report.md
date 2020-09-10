@@ -124,6 +124,7 @@ Finally, the lane is detected and filled with the cv2.fillPoly from the
 The lane detected is warped back using the first parameter `reverse` of the original warp method on the
  `utilities.image_utility.py` file, on line 27, and the method `utilities.image_utility.reverse_warp()`.  
 ![result](results/result.png)
+
 ---
 
 ### Pipeline [Video](https://youtu.be/yAzrk6jL2NY)
@@ -131,6 +132,7 @@ The lane detected is warped back using the first parameter `reverse` of the orig
 The [video_pipeline.py](video_pipeline.py) contains the code to execute the pipeline on a video.
  The first frame uses the sliding window method, and the following steps use the search_around_poly
   method so uses the original lane polygon.
+  
 ---
 
 ### Conclusions
