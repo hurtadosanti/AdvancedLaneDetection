@@ -20,7 +20,7 @@ The goals of this project are the following:
 
 - The [Pipeline description](Pipeline.ipynb) shows how the pipeline is used
 
-- The [video pipeline](video_pipeline.py) runs the pipeline for a [video](https://youtu.be/yAzrk6jL2NY)  
+- The [video pipeline](video_pipeline.py) runs the pipeline for a [video](https://youtu.be/7CRFFe4ijeI)  
 
 - On the [utilities folder](./utilities) can be found the complete implementation of the algorithms
 

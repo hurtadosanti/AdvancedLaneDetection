@@ -128,7 +128,7 @@ The lane detected is warped back using the first parameter `reverse` of the orig
 
 ---
 
-### Pipeline [Video](https://youtu.be/yAzrk6jL2NY)
+### Pipeline [Video](https://youtu.be/7CRFFe4ijeI)
 
 The [video_pipeline.py](video_pipeline.py) contains the code to execute the pipeline on a video.
  The first frame uses the sliding window method, and the following steps use the `search_around_polylines()` 
