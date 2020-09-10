@@ -85,22 +85,22 @@ dst = np.float32(
 The [jupyter notebook](tests/test_warp_image.ipynb) shows the results for all the test images.
 
 ### Lane identification
-The code for the lane identification can be found in the [utilities.lane_finder.Lanes](utilities/finder.py) class.
+The code for the lane identification can be found in the [utilities.finder.Lanes](utilities/finder.py) class.
 
 To identify where the lanes start, first the histogram is calculated.
 
 ![histogram](results/histogram.png)
  
-Then calling the fit_polynomial, the sliding windows algorithm will be used to identify the complete line.
+Then calling the plot_polylines, the sliding windows algorithm will be used to identify the complete line.
 
 ![sliding windows](results/sliding_window.png)
 
-To make it faster it is also possible to search where the line was found before using the `search_around_poly()` method.
+To make it faster it is also possible to search where the line was found before using the `search_around_polylines()` method.
 
 ![search](results/search_around.png)
  
 ### Lane-line pixels
-The lane vectors can be found using the `generate_plotting_values()` method.
+The lane vectors can be found using the `draw_lane_section()` method.
 
 ![vectors](results/lane_vectors.png).
 
@@ -119,7 +119,8 @@ and the center of the two lanes as the offset of the car. Using the same code as
 
 ### Resultant lane 
 Finally, the lane is detected and filled with the cv2.fillPoly from the
- [utilities.lane_finder.py](utilities.lane_finder.py) from line 152. 
+ [utilities.finder.py](utilities.finder.py) using the method `draw_lane_section()` on line 148 for a fix image or
+  `draw_lane_average()` on line 155. 
 
 The lane detected is warped back using the first parameter `reverse` of the original warp method on the
  `utilities.image_utility.py` file, on line 27, and the method `utilities.image_utility.reverse_warp()`.  
@@ -130,8 +131,9 @@ The lane detected is warped back using the first parameter `reverse` of the orig
 ### Pipeline [Video](https://youtu.be/yAzrk6jL2NY)
 
 The [video_pipeline.py](video_pipeline.py) contains the code to execute the pipeline on a video.
- The first frame uses the sliding window method, and the following steps use the search_around_poly
-  method so uses the original lane polygon.
+ The first frame uses the sliding window method, and the following steps use the `search_around_polylines()` 
+  method so uses the original lane polygon. To reduce the jitter the last 5 left and right x and y points found on the
+   frames are average 
   
 ---
 
@@ -149,3 +151,6 @@ An option is to have a set of algorithms to test the external context. Also,
 
 On the performance side, 
 will be good to profile the code and see if the usage of a GPU or C++ code can improve the performance. 
+
+There is still place to improve the detection on problematic zones since the sliding windows are calculated only 
+on the first frame of the video, an option is to detect problematic polylines and try to find again the sliding windows.

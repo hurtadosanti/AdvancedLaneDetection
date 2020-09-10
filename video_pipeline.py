@@ -8,7 +8,7 @@ from utilities import thresholds
 
 
 def write_text(frame, text, x, y):
-    cv2.putText(frame, text, (x, y), 0, 1, (255, 255, 255), 1)
+    cv2.putText(frame, text, (x, y), 0, 0.7, (255, 255, 255), 1)
 
 
 class VideoLaneLineDetection:
@@ -19,7 +19,6 @@ class VideoLaneLineDetection:
         c.calibrate_camera('./camera_cal/')
         self.calibration = c
         self.cap = cv2.VideoCapture(video_path)
-
 
     def process_video(self):
         lane_finder = finder.LaneFinder()
@@ -42,10 +41,14 @@ class VideoLaneLineDetection:
             else:
                 plot_y, left_fit_x, right_fit_x = lane_finder.search_around_polylines(combined_binary, 25)
 
+            left, right = image_utility.measure_curvature_real(plot_y, lane_finder.left_fit, lane_finder.right_fit)
+            pos = image_utility.measure_vehicle_distance(frame.shape[0], frame.shape[1], lane_finder.left_fit,
+                                                         lane_finder.right_fit)
+            text = f'left curvature:{left:.2f}mts right curvature:{right:.2f}mts center offset:{pos:.2f}mts'
             reversed_frame = image_utility.reverse_warp(frame, lane_finder.result_image, reverse,
                                                         (frame.shape[1], frame.shape[0]),
                                                         0.3)
-
+            write_text(reversed_frame, text, 25, 25)
             cv2.imshow('lanes', reversed_frame)
             out.write(reversed_frame)
             cv2.waitKey(1)
