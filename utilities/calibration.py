@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
 import cv2
-import glob
 import os
 import logging
 import pickle
@@ -30,11 +29,12 @@ class CameraCalibration:
         self.object_points_found.clear()
         self.image_points_found = []  # 2d points in image plane.
         self.image_points_found.clear()
-        # Path of the images to calibrate the camera
-        # Read
         for image_name in [i for i in os.listdir(path) if i.endswith('.jpg')]:
             img = cv2.imread(path+image_name)
-            logging.info(path+image_name)
+            if img is None:
+                logging.error(f'Empty image {path}{image_name}')
+                raise Exception(f'Image was not found on file:{path}{image_name}', 'Check the path is correct')
+            logging.info(f'Image to be processed{path}{image_name}')
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             ret, corners = cv2.findChessboardCorners(gray, (nx, ny), None)
             if ret:
@@ -50,8 +50,6 @@ class CameraCalibration:
                         raise Exception(message)
             else:
                 logging.warning('no corners found on file:' + image_name)
-
-        return self.object_points_found, self.image_points_found
 
     def serialize_calibration(self, path: str):
         # TODO: Check that the path is a directory
@@ -70,4 +68,4 @@ class CameraCalibration:
                                                            gray.shape[::-1], None, None)
         if not ret:
             logging.error(ret.msg)
-        return cv2.undistort(img, mtx, dist, None, mtx), mtx, dist
+        return cv2.undistort(img, mtx, dist, None, mtx)

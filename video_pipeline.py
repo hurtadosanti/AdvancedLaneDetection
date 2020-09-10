@@ -30,7 +30,7 @@ class VideoLaneLineDetection:
                 cv2.destroyAllWindows()
                 return
 
-            undistorted, mtx, dist = self.calibration.undistort_image(frame)
+            undistorted = self.calibration.undistort_image(frame)
             warped, reverse = image_utility.warp_image(undistorted, 140, 470, 100)
             combined_binary = thresholds.highlight_features(warped, 7, (50, 150), (50, 200), (0.5, np.pi / 2),
                                                             (80, 200))
