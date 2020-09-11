@@ -12,30 +12,24 @@ The goals of this project are the following:
 * Warp the detected lane boundaries back onto the original image.
 * Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
 
-## Detail Description
+You can find a thorough description here on the [detail description](detail_description.md).
+ To know what was expected to be accomplished on the project you can review the
+  [rubric points](https://review.udacity.com/#!/rubrics/571/view).  
 
-- The [Rubric Points](https://review.udacity.com/#!/rubrics/571/view) describe what is expected for the project 
-
-- A [Detailed Report](Report.md) presents what was done 
-
-- The [Pipeline description](Pipeline.ipynb) shows how the pipeline is used
-
-- The [video pipeline](video_pipeline.py) runs the pipeline for a [video](https://youtu.be/7CRFFe4ijeI)  
-
-- On the [utilities folder](./utilities) can be found the complete implementation of the algorithms
-
-- Unit tests and integration tests are located on the [Test folder](./tests) 
+The [Pipeline description](Pipeline.ipynb) shows how the pipeline is used, and the [video pipeline](VideoPipeline.py)
+ runs the pipeline on a video stream. To see the implementation of the algorithms look in the
+  [utility folder](./utilities).
+   Finally, the unit tests and integration tests are located on the [tests folder](./tests) 
 
 ## Environment
 The environment was created using [miniconda](https://docs.conda.io/en/latest/miniconda.html),
- using the following configurations:
-
-### Channels
-  - defaults
-### Dependencies
+ using the following configurations, [environment.yml](environment.yml).
+ 
+### Libraries
+The libraries used on this project are:
   - numpy
   - matplotlib
   - opencv
   - jupyter
 
- The complete environment can be found on the [yml file](environment.yml) 
+ 

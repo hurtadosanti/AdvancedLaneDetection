@@ -44,12 +44,18 @@ class VideoLaneLineDetection:
             left, right = image_utility.measure_curvature_real(plot_y, lane_finder.left_fit, lane_finder.right_fit)
             pos = image_utility.measure_vehicle_distance(frame.shape[0], frame.shape[1], lane_finder.left_fit,
                                                          lane_finder.right_fit)
-            text = f'left curvature:{left:.2f}mts right curvature:{right:.2f}mts center offset:{pos:.2f}mts'
+            text = f'Center offset:{pos:.2f}mts'
             reversed_frame = image_utility.reverse_warp(frame, lane_finder.result_image, reverse,
                                                         (frame.shape[1], frame.shape[0]),
                                                         0.3)
             write_text(reversed_frame, text, 25, 25)
-            cv2.imshow('lanes', reversed_frame)
+            # Stack for debugging purposes
+            size = (frame.shape[1]//2, frame.shape[0]//2)
+            warped = cv2.resize(warped, size)
+            lanes = cv2.resize(lane_finder.result_image, size)
+            panel = np.vstack((warped, lanes))
+            output = np.hstack((reversed_frame, panel))
+            cv2.imshow('lanes', output)
             out.write(reversed_frame)
             cv2.waitKey(1)
 

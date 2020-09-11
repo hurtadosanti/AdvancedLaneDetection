@@ -127,3 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.idea/**
+.vscode/**
+challenge_video.mp4
+output.avi
+output.mp4

@@ -1,6 +1,6 @@
 # Advanced Lane Finding Project Report
 
-This report is divided into four(4) sections, 1) Camera Calibration, 2) Pipeline for a single image,
+This document is divided into four(4) sections, 1) Camera Calibration, 2) Pipeline for a single image,
  3) How the pipeline works on a video and 4) Conclusions and future work.
 
 ## Camera Calibration
@@ -130,7 +130,7 @@ The lane detected is warped back using the first parameter `reverse` of the orig
 
 ### Pipeline [Video](https://youtu.be/7CRFFe4ijeI)
 
-The [video_pipeline.py](video_pipeline.py) contains the code to execute the pipeline on a video.
+The [video_pipeline.py](VideoPipeline.py) contains the code to execute the pipeline on a video.
  The first frame uses the sliding window method, and the following steps use the `search_around_polylines()` 
   method so uses the original lane polygon. To reduce the jitter the last 5 left and right x and y points found on the
    frames are average 
