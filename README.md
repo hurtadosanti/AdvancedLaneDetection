@@ -29,4 +29,8 @@ The libraries used on this project are:
   - opencv
   - jupyter
 
+ ### References
+ https://github.com/udacity/CarND-Advanced-Lane-Lines
  
+ ## License
+ MIT License Copyright (c) 2016-2018 Udacity, Inc.
